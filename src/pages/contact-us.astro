@@ -1,0 +1,68 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+---
+
+<Layout title="Contact Us" description="Get in touch with Family Camping Hub">
+  <main class='flex flex-col'>
+    <section class='py-8 sm:pt-16 sm:pb-24'>
+      <div class='mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:space-y-16 lg:px-8'>
+        <div class='md:grid md:grid-cols-1 lg:grid-cols-1'>
+          <div class='mx-auto w-full space-y-12 md:col-span-1 lg:col-span-1 md:max-w-[60ch] lg:max-w-[75ch]'>
+            <!-- Breadcrumbs -->
+            <div class='space-y-6'>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href='/'>Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Contact Us</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <!-- Title and Description -->
+              <h1 class='text-foreground text-4xl font-semibold'>Contact Us</h1>
+              <p class='text-muted-foreground text-xl'>
+                Have a question, suggestion, or just want to say hello? We'd love to hear from you.
+              </p>
+
+              <Separator />
+
+              <!-- Content -->
+              <div class='prose dark:prose-invert max-w-none space-y-8'>
+                <h2>Get in Touch</h2>
+                <p className='text-muted-foreground'>
+                  For general inquiries, feedback, or collaboration opportunities, please reach out via email:
+                </p>
+                <p className='text-primary text-lg font-medium'>
+                  <a href='mailto:Michael@familycampinghub.shop'>Michael@familycampinghub.shop</a>
+                </p>
+
+                <h2>Follow Us</h2>
+                <p className='text-muted-foreground'>
+                  Stay connected with us on social media for the latest camping tips, gear reviews, and outdoor inspiration.
+                </p>
+
+                <h2>Affiliate Disclosure</h2>
+                <p className='text-muted-foreground'>
+                  Family Camping Hub is a participant in the Amazon Services LLC Associates Program. As an Amazon Associate, we earn from qualifying purchases. This comes at no extra cost to you and helps us keep providing free content.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

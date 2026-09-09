@@ -1,0 +1,87 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+---
+
+<Layout title="Support" description="Get help and support for Family Camping Hub">
+  <main class='flex flex-col'>
+    <section class='py-8 sm:pt-16 sm:pb-24'>
+      <div class='mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:space-y-16 lg:px-8'>
+        <div class='md:grid md:grid-cols-1 lg:grid-cols-1'>
+          <div class='mx-auto w-full space-y-12 md:col-span-1 lg:col-span-1 md:max-w-[60ch] lg:max-w-[75ch]'>
+            <!-- Breadcrumbs -->
+            <div class='space-y-6'>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href='/'>Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Support</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <!-- Title and Description -->
+              <h1 class='text-foreground text-4xl font-semibold'>Support</h1>
+              <p class='text-muted-foreground text-xl'>
+                Have questions about camping gear, trip planning, or need help with our recommendations? We're here to assist you.
+              </p>
+
+              <Separator />
+
+              <!-- FAQ Section -->
+              <div class='prose dark:prose-invert max-w-none space-y-6'>
+                <h2>Frequently Asked Questions</h2>
+
+                <details class='border-border rounded-lg border p-4'>
+                  <summary class='cursor-pointer font-medium'>How do you select camping gear recommendations?</summary>
+                  <p className='text-muted-foreground mt-2'>
+                    Our team researches and tests camping products thoroughly. We consider factors like durability, ease of use, value for money, and real-world family testing. We only recommend gear we genuinely believe in.
+                  </p>
+                </details>
+
+                <details class='border-border rounded-lg border p-4'>
+                  <summary class='cursor-pointer font-medium'>Why should I trust your reviews?</summary>
+                  <p className='text-muted-foreground mt-2'>
+                    We provide honest, unbiased reviews based on hands-on experience. While we may earn commissions from affiliate links, this does not influence our opinions or ratings.
+                  </p>
+                </details>
+
+                <details class='border-border rounded-lg border p-4'>
+                  <summary class='cursor-pointer font-medium'>How do I know which tent size is right for my family?</summary>
+                  <p className='text-muted-foreground mt-2'>
+                    Check out our comprehensive guide on choosing the right tent. We recommend adding 2 extra capacity spots to the number of people in your family for comfort.
+                  </p>
+                </details>
+
+                <details class='border-border rounded-lg border p-4'>
+                  <summary class='cursor-pointer font-medium'>Do you offer personalized camping advice?</summary>
+                  <p className='text-muted-foreground mt-2'>
+                    Yes! Reach out via our contact form and we'll do our best to help with your specific camping needs and questions.
+                  </p>
+                </details>
+
+                <h2>Still Need Help?</h2>
+                <p className='text-muted-foreground'>
+                  If you couldn't find the answer you were looking for, feel free to reach out to us through our
+                  <a href='/contact-us' className='text-primary font-medium hover:underline'> contact page</a>.
+                  We typically respond within 24-48 hours.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

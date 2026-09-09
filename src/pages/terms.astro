@@ -1,0 +1,96 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+---
+
+<Layout title="Terms & Conditions" description="Terms and conditions for Family Camping Hub">
+  <main class='flex flex-col'>
+    <section class='py-8 sm:pt-16 sm:pb-24'>
+      <div class='mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:space-y-16 lg:px-8'>
+        <div class='md:grid md:grid-cols-1 lg:grid-cols-1'>
+          <div class='mx-auto w-full space-y-12 md:col-span-1 lg:col-span-1 md:max-w-[60ch] lg:max-w-[75ch]'>
+            <!-- Breadcrumbs -->
+            <div class='space-y-6'>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href='/'>Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href='/#'>Legal</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Terms & Conditions</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <!-- Title and Description -->
+              <h1 class='text-foreground text-4xl font-semibold'>Terms & Conditions</h1>
+              <p class='text-muted-foreground text-xl'>Last updated: September 2025</p>
+
+              <Separator />
+
+              <!-- Content -->
+              <div class='prose dark:prose-invert max-w-none space-y-8'>
+                <h2>1. Introduction</h2>
+                <p className='text-muted-foreground'>
+                  Welcome to Family Camping Hub. By accessing or using our website, you agree to be bound by these Terms & Conditions. If you do not agree with any part of these terms, please do not use our website.
+                </p>
+
+                <h2>2. Amazon Affiliate Disclosure</h2>
+                <p className='text-muted-foreground'>
+                  Family Camping Hub is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com. As an Amazon Associate, we earn from qualifying purchases.
+                </p>
+                <p className='text-muted-foreground'>
+                  When you click on our affiliate links and make a purchase on Amazon, we may receive a small commission at no additional cost to you. This helps support our website and allows us to continue providing free camping guides and reviews.
+                </p>
+
+                <h2>3. Content Accuracy</h2>
+                <p className='text-muted-foreground'>
+                  We strive to provide accurate and up-to-date information on our website. However, we make no warranties or representations about the accuracy, completeness, or suitability of the information contained on this website. Product prices, availability, and specifications may change without notice.
+                </p>
+
+                <h2>4. Intellectual Property</h2>
+                <p className='text-muted-foreground'>
+                  All content on Family Camping Hub, including text, images, logos, and graphics, is the property of Family Camping Hub or its content suppliers and is protected by copyright laws. You may not reproduce, distribute, or use any content without our prior written permission.
+                </p>
+
+                <h2>5. External Links</h2>
+                <p className='text-muted-foreground'>
+                  Our website may contain links to external websites. We are not responsible for the content or practices of these external sites. We encourage you to review the terms and privacy policies of any third-party sites you visit.
+                </p>
+
+                <h2>6. Limitation of Liability</h2>
+                <p className='text-muted-foreground'>
+                  Family Camping Hub shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of or inability to use our website or any linked sites. We do not guarantee the safety or suitability of any recommended camping products or locations.
+                </p>
+
+                <h2>7. Changes to Terms</h2>
+                <p className='text-muted-foreground'>
+                  We reserve the right to modify these Terms & Conditions at any time. Changes will be posted on this page with an updated revision date. Continued use of our website after any changes constitutes acceptance of the new terms.
+                </p>
+
+                <h2>8. Contact Information</h2>
+                <p className='text-muted-foreground'>
+                  If you have any questions about these Terms & Conditions, please contact us through our
+                  <a href='/contact-us' className='text-primary font-medium hover:underline'> contact page</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

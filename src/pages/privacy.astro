@@ -1,0 +1,119 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator
+} from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+---
+
+<Layout title="Privacy Policy" description="Privacy policy for Family Camping Hub">
+  <main class='flex flex-col'>
+    <section class='py-8 sm:pt-16 sm:pb-24'>
+      <div class='mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:space-y-16 lg:px-8'>
+        <div class='md:grid md:grid-cols-1 lg:grid-cols-1'>
+          <div class='mx-auto w-full space-y-12 md:col-span-1 lg:col-span-1 md:max-w-[60ch] lg:max-w-[75ch]'>
+            <!-- Breadcrumbs -->
+            <div class='space-y-6'>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href='/'>Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href='/#'>Legal</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Privacy Policy</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              <!-- Title and Description -->
+              <h1 class='text-foreground text-4xl font-semibold'>Privacy Policy</h1>
+              <p class='text-muted-foreground text-xl'>Last updated: September 2025</p>
+
+              <Separator />
+
+              <!-- Content -->
+              <div class='prose dark:prose-invert max-w-none space-y-8'>
+                <h2>Introduction</h2>
+                <p className='text-muted-foreground'>
+                  At Family Camping Hub, we take your privacy seriously. This Privacy Policy explains how we collect, use, and protect your personal information when you visit our website.
+                </p>
+
+                <h2>Information We Collect</h2>
+                <p className='text-muted-foreground'>
+                  We may collect the following types of information:
+                </p>
+                <ul className='text-muted-foreground list-inside list-disc space-y-2 pl-2'>
+                  <li><strong>Non-personal information:</strong> Browser type, device type, pages visited, time spent on pages, and other anonymous usage data collected via cookies and analytics tools.</li>
+                  <li><strong>Voluntary information:</strong> Any information you voluntarily provide through our contact forms, such as your name and email address.</li>
+                </ul>
+
+                <h2>Cookies and Tracking</h2>
+                <p className='text-muted-foreground'>
+                  We use cookies and similar tracking technologies to enhance your browsing experience. Cookies help us understand how visitors use our site so we can improve our content. You can disable cookies in your browser settings, though some features of our site may not function properly.
+                </p>
+
+                <h2>Affiliate Links and Third-Party Services</h2>
+                <p className='text-muted-foreground'>
+                  Our website contains affiliate links, primarily to Amazon. When you click on these links and make a purchase, we may earn a commission at no extra cost to you.
+                </p>
+                <p className='text-muted-foreground'>
+                  Amazon and other third-party services may use cookies and collect data about your visit. We encourage you to review the privacy policies of Amazon.com and any other linked sites to understand how they handle your data.
+                </p>
+                <p className='text-muted-foreground'>
+                  - <a href='https://www.amazon.com/privacy' className='text-primary hover:underline' target='_blank' rel='noopener noreferrer'>Amazon Privacy Policy</a>
+                </p>
+
+                <h2>How We Use Your Information</h2>
+                <p className='text-muted-foreground'>
+                  Any information we collect is used to:
+                </p>
+                <ul className='text-muted-foreground list-inside list-disc space-y-2 pl-2'>
+                  <li>Improve our website and content</li>
+                  <li>Respond to your inquiries</li>
+                  <li>Send updates or newsletters (only if you opt in)</li>
+                  <li>Analyze website traffic and usage patterns</li>
+                </ul>
+
+                <h2>Data Security</h2>
+                <p className='text-muted-foreground'>
+                  We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
+                </p>
+
+                <h2>Children's Privacy</h2>
+                <p className='text-muted-foreground'>
+                  Our website is designed for general audiences and is not directed at children under 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe your child has provided us with personal information, please contact us.
+                </p>
+
+                <h2>Your Rights</h2>
+                <p className='text-muted-foreground'>
+                  You have the right to access, correct, or delete any personal information we hold about you. To exercise these rights, please contact us through our contact page.
+                </p>
+
+                <h2>Changes to This Policy</h2>
+                <p className='text-muted-foreground'>
+                  We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated revision date. We encourage you to review this policy periodically.
+                </p>
+
+                <h2>Contact Us</h2>
+                <p className='text-muted-foreground'>
+                  If you have any questions or concerns about this Privacy Policy, please reach out to us through our
+                  <a href='/contact-us' className='text-primary font-medium hover:underline'> contact page</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>

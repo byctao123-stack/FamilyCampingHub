@@ -1,0 +1,31 @@
+{
+  "name": "Family Camping Hub",
+  "short_name": "Camping Hub",
+  "description": "Your ultimate resource for family camping tips, gear reviews, campground guides, and campfire recipes.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#eaedf8",
+  "theme_color": "#15803d",
+  "orientation": "portrait-primary",
+  "categories": [
+    "lifestyle",
+    "travel",
+    "outdoors"
+  ],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Home",
+      "short_name": "Home",
+      "description": "Go to homepage",
+      "url": "/"
+    }
+  ]
+}

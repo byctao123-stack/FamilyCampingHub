@@ -15,7 +15,6 @@ const CTA = () => {
           <p className='mx-auto mt-4 max-w-2xl text-lg text-green-500 md:text-xl'>
             Join thousands of families who trust Family Camping Hub for their outdoor adventures.
           </p>
-
         </div>
       </div>
     </section>

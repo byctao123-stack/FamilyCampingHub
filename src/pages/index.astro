@@ -29,28 +29,26 @@ const allBlogPosts = publishedPosts
   .sort((a, b) => b.pubDate.localeCompare(a.pubDate))
 
 // Page-specific SEO configuration
-const pageTitle = ''
+const pageTitle = 'Home'
 const pageDescription =
-  'Discover insightful articles and tutorials about modern web development, Astro, and building fast, scalable websites with cutting-edge tools.'
-const pageKeywords =
-  'web development, Astro tutorials, scalable websites, modern web technologies, SEO optimization, Tailwind CSS, shadcn UI'
+  'Your ultimate resource for family camping tips, gear reviews, campground guides, and campfire recipes. Make every camping trip unforgettable.'
+const pageKeywords = 'family camping, camping tips, camping gear, campground guide, camping with kids, tent reviews, sleeping bags, camping recipes, campfire fun'
 
 // Structured data for better SEO
 const schema = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: 'Ink',
+  '@type': 'WebSite',
+  name: 'Family Camping Hub',
   description: pageDescription,
-  applicationCategory: 'DeveloperApplication',
-  operatingSystem: 'Any',
-  offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD'
-  },
-  author: {
-    '@type': 'Organization',
-    name: 'Your Company Name'
+  url: 'https://familycampinghub.shop/',
+  inLanguage: 'en-US',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: {
+      '@type': 'EntryPoint',
+      urlTemplate: 'https://familycampinghub.shop/search?q={search_term_string}'
+    },
+    'query-input': 'required name=search_term_string'
   }
 }
 ---

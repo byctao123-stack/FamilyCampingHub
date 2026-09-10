@@ -2,10 +2,9 @@
 
 import { useState } from 'react'
 
-import { SearchIcon, ArrowRightIcon, CalendarDaysIcon } from 'lucide-react'
+import { SearchIcon, CalendarDaysIcon } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
@@ -55,9 +54,9 @@ const BlogGrid = ({ posts, onCategoryClick }: { posts: BlogPost[]; onCategoryCli
             }
           }}
         >
-          <Card className='shadow-none h-[470px] overflow-hidden'>
+          <Card className='shadow-none h-[385px] overflow-hidden'>
             <CardContent className='space-y-3.5'>
-              <div className='mb-6 overflow-hidden rounded-lg sm:mb-12'>
+              <div className='mb-4 overflow-hidden rounded-lg sm:mb-4'>
                 <img
                   src={post.imageUrl}
                   alt={post.imageAlt}
@@ -82,17 +81,6 @@ const BlogGrid = ({ posts, onCategoryClick }: { posts: BlogPost[]; onCategoryCli
                 </Badge>
               </div>
               <h3 className='line-clamp-2 text-lg font-medium md:text-xl'>{post.title}</h3>
-              <p className='text-muted-foreground line-clamp-2 text-base'>{post.description}</p>
-              <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium'>{post.author}</span>
-                <Button
-                  size='icon'
-                  className='group-hover:bg-primary! bg-background text-foreground hover:bg-primary! hover:text-primary-foreground group-hover:text-primary-foreground group-hover:border-primary hover:border-primary border-border border bg-clip-border'
-                >
-                  <ArrowRightIcon className='size-4 -rotate-45' />
-                  <span className='sr-only'>Read more: {post.title}</span>
-                </Button>
-              </div>
             </CardContent>
           </Card>
         </a>

@@ -1,4 +1,5 @@
 ---
+
 id: 2026091004
 slug: "coleman-sundome-tent-review"
 title: "Coleman Sundome 4-Person Tent Review: The Workhorse That Actually Delivers (Mostly)"
@@ -8,12 +9,12 @@ author: "Michael"
 category: "gear"
 readTime: 8
 featured: true
-imageUrl: "/images/articles/coleman-sundome-tent/01-coleman-sundome-tent.jpg"
+imageUrl: "/images/articles/coleman-sundome-tent-review/01-coleman-sundome-tent.jpg"
 imageAlt: "Coleman Sundome 4-Person tent set up at a family campground with rainfly on"
 avatarUrl: "/images/avatars/1.webp"
 productCard:
   title: "Coleman Sundome 4-Person Camping Tent with Rainfly"
-  imageUrl: "/images/articles/coleman-sundome-tent/01-coleman-sundome-tent.jpg"
+  imageUrl: "/images/articles/coleman-sundome-tent-review/01-coleman-sundome-tent.jpg"
   imageAlt: "Coleman Sundome 4-Person tent"
   rating: "4.6 out of 5 stars"
   reviewCount: "23,185"
@@ -38,26 +39,30 @@ With a 4.6-star rating from over 23,000 reviews on Amazon, it's clear I'm not th
 
 ---
 
+
+
 ## What Is the Coleman Sundome?
 
 The Sundome is Coleman's entry-to-mid-level family tent line. It comes in 2-person, 3-person, 4-person, and 6-person configurations. The 4-person model (the one I own and the most popular) is the sweet spot — big enough for a family of four with gear, small enough to fit in most standard campsites.
 
 Key specs at a glance:
 
-| Spec | 4-Person Model |
-|------|---------------|
-| **Price** | Around $100–$130 (varies by retailer) |
-| **Capacity** | 4 people (fits 1 queen air bed) |
-| **Floor Area** | 9' x 7' (63 sq ft) |
-| **Peak Height** | 4' 11" |
-| **Seasons** | 3-season |
-| **Setup Time** | ~10 minutes (Insta-Clip system) |
-| **Doors** | 2 (opposite long sides) |
-| **Ventilation** | Large windows + ground vent + roof vent |
-| **Rainfly** | Included (full coverage, WeatherTec system) |
-| **Wind Rating** | 35+ mph (strong frame) |
-| **Special Features** | E-Port, Polyguard fabric, welded corners |
-| **Brand** | Coleman (est. 1900) |
+
+| Spec                 | 4-Person Model                              |
+| -------------------- | ------------------------------------------- |
+| **Price**            | Around $100–$130 (varies by retailer)       |
+| **Capacity**         | 4 people (fits 1 queen air bed)             |
+| **Floor Area**       | 9' x 7' (63 sq ft)                          |
+| **Peak Height**      | 4' 11"                                      |
+| **Seasons**          | 3-season                                    |
+| **Setup Time**       | ~10 minutes (Insta-Clip system)             |
+| **Doors**            | 2 (opposite long sides)                     |
+| **Ventilation**      | Large windows + ground vent + roof vent     |
+| **Rainfly**          | Included (full coverage, WeatherTec system) |
+| **Wind Rating**      | 35+ mph (strong frame)                      |
+| **Special Features** | E-Port, Polyguard fabric, welded corners    |
+| **Brand**            | Coleman (est. 1900)                         |
+
 
 The Sundome has been around for decades. This isn't a new product — it's a refined one. Coleman has been tweaking the design since the 1980s, and the current version is the result of that iterative improvement.
 
@@ -79,6 +84,8 @@ I use it all the time at campgrounds with electric hookups. I can run my fan, ch
 
 ---
 
+
+
 ## Setup: They Say 10 Minutes, They're Not Far Off
 
 Coleman markets the Sundome as a "10-minute tent." In my experience, that's accurate if:
@@ -94,6 +101,8 @@ The pole system uses color-coded fiberglass poles — the poles have colored con
 **One tip:** Lay everything out before you start. Poles, stakes, rainfly, tent body. Having it organized before you begin cuts setup time in half.
 
 ---
+
+
 
 ## Space: Realistic Expectations
 
@@ -111,6 +120,8 @@ The two doors are on opposite long sides. This is good for airflow (you can cros
 
 ---
 
+
+
 ## Weather Performance: Better Than You'd Expect
 
 This is where the Sundome surprised me.
@@ -125,6 +136,8 @@ This is where the Sundome surprised me.
 
 ---
 
+
+
 ## Durability: Two Years In
 
 I've used this tent 15+ times across two years. Here's the wear:
@@ -138,6 +151,8 @@ I've used this tent 15+ times across two years. Here's the wear:
 For $98, I expected it to fall apart within a year. It hasn't. That's the Coleman brand in a nutshell — not fancy, but durable.
 
 ---
+
+
 
 ## What I Don't Like
 
@@ -155,26 +170,33 @@ Let's be honest about the flaws:
 
 ---
 
+
+
 ## Coleman Sundome vs. The Competition
 
 At the $100–$130 price point, the Sundome competes with:
 
-| Feature | Coleman Sundome 4P | Core 4P Instant Tent | Ozark Trail 4P | REI Co-op Base Camp 4P |
-|---------|-------------------|---------------------|----------------|----------------------|
-| **Price Range** | $100–$130 | ~$110–$150 | ~$70–$90 | ~$230–$280 |
-| **Setup Time** | 10–15 min | 60 seconds (instant) | 10–15 min | 15–20 min |
-| **Floor Area** | 9' x 7' (63 sq ft) | ~9' x 7' | ~8' x 7' | ~9' x 8' |
-| **Peak Height** | 4' 11" | ~4' 10" | ~4' 6" | ~5' 6" |
-| **Wind Rating** | 35+ mph | ~20 mph | ~25 mph | 40+ mph |
-| **Best For** | Families, value | Beginners, convenience | Budget campers | Serious car campers |
+
+| Feature         | Coleman Sundome 4P | Core 4P Instant Tent   | Ozark Trail 4P | REI Co-op Base Camp 4P |
+| --------------- | ------------------ | ---------------------- | -------------- | ---------------------- |
+| **Price Range** | $100–$130          | ~$110–$150             | ~$70–$90       | ~$230–$280             |
+| **Setup Time**  | 10–15 min          | 60 seconds (instant)   | 10–15 min      | 15–20 min              |
+| **Floor Area**  | 9' x 7' (63 sq ft) | ~9' x 7'               | ~8' x 7'       | ~9' x 8'               |
+| **Peak Height** | 4' 11"             | ~4' 10"                | ~4' 6"         | ~5' 6"                 |
+| **Wind Rating** | 35+ mph            | ~20 mph                | ~25 mph        | 40+ mph                |
+| **Best For**    | Families, value    | Beginners, convenience | Budget campers | Serious car campers    |
+
 
 **My take:** The Sundome hits the sweet spot. The Core Instant Tent is easier to set up but heavier and less weather-resistant. The Ozark Trail is cheaper but I've seen too many zipper failures in reviews. The REI Base Camp is objectively better but costs more than double. For most families, the Sundome is the right call.
 
 ---
 
+
+
 ## Who Should Buy the Coleman Sundome
 
 **Buy it if:**
+
 - You're a family car camping (not backpacking)
 - You want a tent that lasts more than one season
 - Your budget is under $150 for a tent
@@ -182,12 +204,15 @@ At the $100–$130 price point, the Sundome competes with:
 - You want something easy enough that a teenager can set it up
 
 **Skip it if:**
+
 - You're backpacking — 9.5 lbs is too heavy
 - You need a 4-season tent — this won't handle snow
 - You want instant setup — this requires pole assembly
 - You're a serious camper who spends $300+ on a tent — you'll want something lighter and more premium
 
 ---
+
+
 
 ## Two Years Later: Would I Buy It Again?
 

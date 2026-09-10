@@ -16,6 +16,7 @@ import { getRelatedPosts, getPostNavigation, calculateReadTime } from '@/utils/b
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 
 import Blog from '@/components/blocks/blog-related-post/blog-related-post'
+import ProductCard from '@/components/ProductCard.astro'
 
 export async function getStaticPaths() {
   const blogEntries = await getCollection('blog')
@@ -148,6 +149,23 @@ const schema = {
             <article id='content' class='prose dark:prose-invert max-w-none'>
               <Content />
             </article>
+
+            <!-- Product Card (for product review articles) -->
+            {
+              entry.data.productCard && (
+                <ProductCard
+                  title={entry.data.productCard.title}
+                  imageUrl={entry.data.productCard.imageUrl}
+                  imageAlt={entry.data.productCard.imageAlt}
+                  rating={entry.data.productCard.rating}
+                  reviewCount={entry.data.productCard.reviewCount}
+                  priceRange={entry.data.productCard.priceRange}
+                  features={entry.data.productCard.features}
+                  affiliateUrl={entry.data.productCard.affiliateUrl}
+                  badge={entry.data.productCard.badge}
+                />
+              )
+            }
 
             <!-- Post Navigation -->
             <div class='flex w-full justify-between pt-8'>

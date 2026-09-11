@@ -89,9 +89,29 @@
         // Title
         data.title = st(document.querySelector('#productTitle'));
 
-        // Brand
-        data.brand = st(document.querySelector('#bylineInfo'))
-            .replace(/^Visit the\s+/i, '').replace(/\s+Store$/i, '').trim();
+        // Brand - try multiple selectors
+        data.brand = '';
+        const brandSelectors = [
+            '#bylineInfo',
+            '#bylineInfo_feature_div',
+            '.po-brand .po-break-word',
+            'tr.po-brand td.a-span9 span',
+            '#brand',
+            '[data-feature-name="bylineInfo"]',
+        ];
+        for (const sel of brandSelectors) {
+            const el = document.querySelector(sel);
+            if (!el) continue;
+            let brand = getCleanText(el, 80)
+                .replace(/^Visit the\s+/i, '')
+                .replace(/\s+Store$/i, '')
+                .replace(/^Brand:\s*/i, '')
+                .trim();
+            if (brand && brand.length > 1 && brand.length < 80) {
+                data.brand = brand;
+                break;
+            }
+        }
 
         // Price
         const pw = document.querySelector('.a-price-whole');
@@ -168,39 +188,128 @@
 
 
         // --- Collapsed/Accordion Sections (Features & Specs, Materials, Measurements, etc.) ---
-        // Strategy: try multiple approaches
-        // 1) Look for expander-content directly
-        // 2) Try to expand hidden panels by clicking headers
-        // 3) Fall back to known ID containers
         data.accordionSections = {};
 
-        // Helper: extract text from an element, filtering out CSS/JS noise
+        // Check if an element is likely a code/CSS/JS block
+        function isCodeBlock(el) {
+            const tag = el.tagName.toLowerCase();
+            if (tag === 'style' || tag === 'script') return true;
+            const cls = (el.className || '').toLowerCase();
+            if (cls.includes('script') || cls.includes('style') || cls.includes('hidden') || cls.includes('display-none')) return true;
+            // Check inline style
+            const style = el.getAttribute('style') || '';
+            if (style.includes('display:none') || style.includes('display: none') || style.includes('position:absolute') && style.includes('left:-9999')) return true;
+            return false;
+        }
+
+        // Extract text from visible child elements only (not hidden code blocks)
+        function extractFromVisibleChildren(container, maxLen) {
+            if (!container) return '';
+            const parts = [];
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, {
+                acceptNode: function(node) {
+                    if (isCodeBlock(node)) return NodeFilter.FILTER_REJECT;
+                    // Skip elements that are clearly UI chrome
+                    const cls = (node.className || '').toLowerCase();
+                    if (cls.includes('sprite') || cls.includes('icon-') || cls.includes('a-icon')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            let node;
+            const seen = new Set();
+            while (node = walker.nextNode()) {
+                if (seen.has(node)) continue;
+                seen.add(node);
+
+                // Only get leaf elements with actual text content
+                const text = (node.textContent || '').trim();
+                if (text.length > 15 && !text.includes('function') && !text.includes('window.') && !text.includes('ue.track')) {
+                    // Additional check: reject if >30% of the text looks like CSS properties
+                    const cssProps = (text.match(/(\w+):\s*[\d{}()#]/g) || []).length;
+                    const words = text.split(/\s+/).length;
+                    if (cssProps / words > 0.3) continue; // likely CSS
+
+                    // Reject lines that are mostly symbols
+                    const symbolRatio = (text.match(/[^\w\s.,!?'"()-]/g) || []).length / text.length;
+                    if (symbolRatio > 0.3) continue;
+
+                    if (!parts.includes(text)) parts.push(text);
+                }
+                if (parts.join(' ').length > maxLen) break;
+            }
+            return parts.join('\n\n').substring(0, maxLen);
+        }
+
+        // Also extract text from direct child elements (simpler approach)
+        function extractFromChildren(container, maxLen) {
+            if (!container) return '';
+            const parts = [];
+            Array.from(container.children).forEach(child => {
+                if (isCodeBlock(child)) return;
+                const text = (child.textContent || '').trim();
+                if (text.length > 15 && !text.includes('function') && !text.includes('window.') && !text.includes('ue.track')) {
+                    // Reject CSS-heavy content
+                    const cssProps = (text.match(/(\w+):\s*[\d{}()#]/g) || []).length;
+                    const words = text.split(/\s+/).length;
+                    if (cssProps / words > 0.25) return;
+                    const symbolRatio = (text.match(/[^\w\s.,!?'"()\-\n]/g) || []).length / text.length;
+                    if (symbolRatio > 0.25) return;
+                    parts.push(text);
+                }
+            });
+            return parts.join('\n\n').substring(0, maxLen);
+        }
+
+        // Helper for basic text extraction (for accordion, etc.)
         function getCleanText(el, maxLen) {
             if (!el) return '';
-            // If the element is hidden (display:none or visibility:hidden), we still want its text
-            const text = el.textContent || '';
+            const text = (el.textContent || '').trim();
             const lines = text.split('\n')
                 .map(l => l.trim())
-                .filter(l => l.length > 2 &&
+                .filter(l => l.length > 3 &&
                     !l.includes('function') &&
-                    !l.includes('{') &&
-                    !l.includes('}') &&
-                    !l.includes('var ') &&
-                    !l.includes('const ') &&
                     !l.includes('window.') &&
                     !l.includes('ue.track') &&
-                    !l.match(/^[\s\W]*$/) // skip lines that are only whitespace/symbols
+                    !l.includes('var ') &&
+                    !l.includes('const ') &&
+                    !l.match(/^[^\w]*$/) // skip lines without any word characters
                 );
             return lines.join('\n').trim().substring(0, maxLen || 1500);
         }
 
         // Try to expand collapsed accordion panels first
+        function tryExpandAccordions() {
+            try {
+                const headers = document.querySelectorAll('.a-expander-header, [data-action="a-expander"]');
+                headers.forEach(header => {
+                    const wrapper = header.closest('[data-action="a-expander"]') ||
+                                   header.parentElement;
+                    const content = wrapper ? wrapper.querySelector('.a-expander-content') : null;
+                    if (content) {
+                        const style = window.getComputedStyle(content);
+                        const isHidden = style.display === 'none' || style.visibility === 'hidden' ||
+                                        content.offsetHeight === 0;
+                        if (isHidden) {
+                            header.click();
+                        }
+                    }
+                });
+                // Also try clicking "Read more" in reviews
+                document.querySelectorAll('[data-hook="review-see-more"], a[data-hook="see-all-reviews"]').forEach(btn => {
+                    try { btn.click(); } catch(e) {}
+                });
+            } catch(e) {
+                // Silently fail
+            }
+        }
+
         tryExpandAccordions();
 
-        // Approach 1: Find all a-expander-content blocks (expanded or not)
+        // Approach 1: Find all a-expander-content blocks
         const expanderContents = document.querySelectorAll('.a-expander-content');
         expanderContents.forEach(contentEl => {
-            // Find the nearest header/title
+            // Find the nearest header/title from parent wrapper
             const wrapper = contentEl.closest('[data-action="a-expander"]') ||
                            contentEl.closest('.a-expander-wrapper') ||
                            contentEl.parentElement;
@@ -209,7 +318,7 @@
                 const headerEl = wrapper.querySelector('.a-expander-header, h3, h4, h2');
                 if (headerEl) title = getCleanText(headerEl, 100);
             }
-            const contentText = getCleanText(contentEl, 1000);
+            const contentText = extractFromVisibleChildren(contentEl, 1000);
             if (contentText.length > 3 && title.length > 1) {
                 data.accordionSections[title] = contentText;
             }
@@ -228,7 +337,8 @@
             if (Object.keys(data.accordionSections).length > 5) return; // already have enough
             const el = document.querySelector(selector);
             if (!el) return;
-            const text = getCleanText(el, 1500);
+            const text = extractFromChildren(el, 1500);
+            if (text.length < 10) text = getCleanText(el, 1500);
             if (text.length > 10) {
                 // Avoid duplicate titles
                 const key = title + ' (' + selector.replace(/#/g, '') + ')';
@@ -255,73 +365,60 @@
             }
         });
 
-        // Helper: try to click accordion headers to expand hidden content
-        function tryExpandAccordions() {
-            try {
-                const headers = document.querySelectorAll('.a-expander-header, [data-action="a-expander"]');
-                headers.forEach(header => {
-                    // Check if the associated content is hidden
-                    const wrapper = header.closest('[data-action="a-expander"]') ||
-                                   header.parentElement;
-                    const content = wrapper ? wrapper.querySelector('.a-expander-content') : null;
-                    if (content) {
-                        const style = window.getComputedStyle(content);
-                        const isHidden = style.display === 'none' || style.visibility === 'hidden' ||
-                                        content.offsetHeight === 0;
-                        if (isHidden) {
-                            header.click();
-                        }
-                    }
-                });
-            } catch(e) {
-                // Silently fail - expanding is best-effort
-            }
-        }
-
         // --- Customer Reviews ---
         data.reviews = { overall: data.rating, totalCount: data.reviewCount, starDistribution: {}, topReviews: [] };
 
         // Star distribution histogram
         const histogram = document.querySelector('#cm_cr_dp_d_rating_histogram') ||
                           document.querySelector('.cr-widget-Histogram') ||
+                          document.querySelector('#histogramTable') ||
+                          document.querySelector('table#histogramTable') ||
                           document.querySelector('[data-hook="rating-count"]');
         if (histogram) {
-            // Try aria-label on bars
-            histogram.querySelectorAll('.a-meter, [aria-label*="star"]').forEach((bar, idx) => {
+            // Strategy 1: Look for meter bars with aria-label
+            histogram.querySelectorAll('.a-meter').forEach(bar => {
                 const label = bar.getAttribute('aria-label') || '';
-                const stars = label.match(/(\d)\s*star/i);
-                if (stars) {
-                    const starCount = stars[1];
-                    const pctMatch = label.match(/(\d+)%/);
-                    data.reviews.starDistribution[starCount + ' stars'] = pctMatch ? pctMatch[1] + '%' : '';
+                const match = label.match(/(\d)\s*stars?\s*\(?\s*(\d+%?)\s*\)?/i);
+                if (match) {
+                    data.reviews.starDistribution[match[1] + ' stars'] = match[2].includes('%') ? match[2] : match[2] + '%';
                 }
             });
-            // Try 2D histogram bars
+
+            // Strategy 2: Look for rows with star count and percentage
             if (Object.keys(data.reviews.starDistribution).length === 0) {
-                const bars = histogram.querySelectorAll('a, .a-size-base');
-                bars.forEach(bar => {
-                    const text = getCleanText(bar, 50);
-                    const match = text.match(/^(\d)\s*★?\s*\(?(\d+)%\)?$/);
+                const rows = histogram.querySelectorAll('tr, .a-histogram-row, li');
+                rows.forEach(row => {
+                    const text = getCleanText(row, 100);
+                    const match = text.match(/(\d)\s*★?\s*\(?\s*(\d+)%\s*\)?/);
                     if (match) {
                         data.reviews.starDistribution[match[1] + ' stars'] = match[2] + '%';
                     }
                 });
             }
+
+            // Strategy 3: Look for any link/text with star + percentage pattern
+            if (Object.keys(data.reviews.starDistribution).length === 0) {
+                histogram.querySelectorAll('a, span, td').forEach(cell => {
+                    const text = getCleanText(cell, 50);
+                    const match = text.match(/^(\d)\s*stars?\s*\(?\s*(\d+%?)\s*\)?$/i);
+                    if (match) {
+                        data.reviews.starDistribution[match[1] + ' stars'] = match[2].includes('%') ? match[2] : match[2] + '%';
+                    }
+                });
+            }
         }
 
-        // Try to find star distribution from review summary text
+        // Strategy 4: Try to find from the rating summary section
         if (Object.keys(data.reviews.starDistribution).length === 0) {
-            const reviewSummary = document.querySelector('#reviewSummary') ||
-                                  document.querySelector('[data-hook="review-summary"]') ||
-                                  document.querySelector('.a-section.review-summary');
-            if (reviewSummary) {
-                const summaryText = getCleanText(reviewSummary, 500);
-                const starMatches = summaryText.match(/(\d)\s*stars?\s*\(?\s*(\d+%?)\s*\)?/gi);
-                if (starMatches) {
-                    starMatches.forEach(m => {
-                        const match = m.match(/(\d)\s*stars?\s*\(?\s*(\d+%?)\s*\)?/i);
-                        if (match) data.reviews.starDistribution[match[1] + ' stars'] = match[2];
-                    });
+            const ratingSummary = document.querySelector('#averageCustomerReviews') ||
+                                  document.querySelector('#acrCustomerReviewDetailLink') ||
+                                  document.querySelector('[data-hook="rating-summary"]');
+            if (ratingSummary) {
+                const text = getCleanText(ratingSummary, 300);
+                // Extract overall rating
+                const overallMatch = text.match(/(\d+\.?\d*)\s*out of\s*5\s*stars?/i);
+                if (overallMatch && !data.rating) {
+                    data.rating = overallMatch[1] + ' out of 5 stars';
                 }
             }
         }
@@ -352,9 +449,47 @@
             const titleEl = card.querySelector('[data-hook="review-title"], .review-title, h5, [data-hook="review-title-link"]');
             r.title = titleEl ? getCleanText(titleEl, 200).trim() : '';
 
-            // Review body
+            // Review body - try multiple strategies
+            r.body = '';
+
+            // Strategy 1: Try aria-label (sometimes Amazon stores full text there)
             const bodyEl = card.querySelector('[data-hook="review-body"], .review-text, .a-expander-content, .a-section.review-data');
-            r.body = bodyEl ? getCleanText(bodyEl, 400).trim() : '';
+            if (bodyEl) {
+                // Try aria-label first (often contains full text when truncated)
+                const ariaText = bodyEl.getAttribute('aria-label') || '';
+                if (ariaText.length > 20) {
+                    r.body = ariaText.trim().substring(0, 400);
+                }
+                // Try textContent
+                if (!r.body) {
+                    r.body = getCleanText(bodyEl, 400);
+                }
+            }
+
+            // Strategy 2: If still empty, try expanding review text
+            if (!r.body) {
+                const expandBtn = card.querySelector('[data-hook="review-see-more"], .a-expander-header');
+                if (expandBtn) {
+                    try { expandBtn.click(); } catch(e) {}
+                }
+                // Re-try after clicking
+                setTimeout(() => {
+                    const retryEl = card.querySelector('[data-hook="review-body"], .a-expander-content');
+                    if (retryEl) r.body = getCleanText(retryEl, 400);
+                }, 100);
+            }
+
+            // Strategy 3: Try all spans/divs in the card for review-like text
+            if (!r.body) {
+                const allSpans = card.querySelectorAll('span.a-size-base, div.a-size-base');
+                for (const span of allSpans) {
+                    const t = getCleanText(span, 400);
+                    if (t.length > 50 && !t.includes('Verified') && !t.includes('report')) {
+                        r.body = t;
+                        break;
+                    }
+                }
+            }
 
             // Author
             const authorEl = card.querySelector('[data-hook="review-author"], .a-profile-name, .review-byline');
@@ -385,21 +520,30 @@
             }
         }
 
-        // Description - try multiple selectors and strategies
+        // Description - try extracting from visible children to avoid CSS/JS noise
         data.description = '';
         const descSelectors = [
             '#productDescription_feature_div',
             '#productDescription',
-            '#aplus_feature_div',
-            '#aplus3p_feature_div',
             '#feature-bullets',
             '[data-feature-name="product-highlights"]',
+            '#summaryBullets_feature_div',
+            '#productSummary',
         ];
         for (const sel of descSelectors) {
             if (data.description.length > 100) break;
             const descEl = document.querySelector(sel);
             if (!descEl) continue;
-            const text = getCleanText(descEl, 2500);
+            // First try child-based extraction (most reliable)
+            let text = extractFromChildren(descEl, 2500);
+            // Fall back to tree walker if child extraction failed
+            if (text.length < 50) {
+                text = extractFromVisibleChildren(descEl, 2500);
+            }
+            // Last resort: basic text extraction
+            if (text.length < 50) {
+                text = getCleanText(descEl, 2500);
+            }
             if (text.length > 50) {
                 data.description = text;
                 break;
@@ -418,26 +562,17 @@
             if (data.aboutThisItem.length > 100) break;
             const aboutEl = document.querySelector(sel);
             if (!aboutEl) continue;
-            const text = getCleanText(aboutEl, 3000);
+            // Try child-based extraction first
+            let text = extractFromChildren(aboutEl, 3000);
+            if (text.length < 50) {
+                text = extractFromVisibleChildren(aboutEl, 3000);
+            }
+            if (text.length < 50) {
+                text = getCleanText(aboutEl, 3000);
+            }
             if (text.length > 50) {
                 data.aboutThisItem = text;
                 break;
-            }
-        }
-        // About This Item: second pass with less aggressive filtering
-        if (!data.aboutThisItem || data.aboutThisItem.length < 50) {
-            const aplusEl = document.querySelector('#aplus_feature_div') ||
-                           document.querySelector('#aplus3p_feature_div');
-            if (aplusEl) {
-                const paragraphs = aplusEl.querySelectorAll('p, li, span.a-text-normal');
-                const parts = [];
-                paragraphs.forEach(p => {
-                    const t = getCleanText(p, 500);
-                    if (t.length > 10 && t.length < 500) parts.push(t);
-                });
-                if (parts.length > 0) {
-                    data.aboutThisItem = parts.join('\n\n').substring(0, 3000);
-                }
             }
         }
 

@@ -43,12 +43,13 @@
                 background: #fff !important; padding: 16px !important; overflow-y: auto !important; flex: 1 !important;
             }
             #extractor-btns {
-                display: flex !important; gap: 8px !important; padding: 12px 16px !important;
+                display: flex !important; gap: 6px !important; padding: 10px 12px !important;
                 background: #f0f0f0 !important; border-top: 1px solid #ddd !important;
+                flex-wrap: wrap !important;
             }
             #extractor-btns button {
-                flex: 1 !important; padding: 10px !important; border-radius: 4px !important;
-                cursor: pointer !important; font-size: 13px !important; font-weight: 600 !important;
+                flex: 1 1 40% !important; padding: 8px !important; border-radius: 4px !important;
+                cursor: pointer !important; font-size: 12px !important; font-weight: 600 !important;
             }
             #btn-copy-json { background: #FFD814 !important; border: 1px solid #F0C14B !important; }
             #btn-copy-text { background: #fff !important; border: 1px solid #ccc !important; }
@@ -189,13 +190,24 @@
             data.aboutThisItem = lines.join('\n').trim().substring(0, 3000);
         }
 
-        // Images
+        // Images - convert to highest resolution available
         data.images = [];
         const seen = new Set();
         document.querySelectorAll('#altImages img, #landingImage').forEach(img => {
             let src = img.getAttribute('data-old-hires') || img.src || '';
-            src = src.replace(/_SX\d+_/, '_SX1500_').replace(/_SY\d+_/, '_SY1500_');
-            if (src && !seen.has(src) && !src.includes('sprite') && !src.includes('gif')) {
+            if (!src || src.includes('sprite') || src.includes('gif')) return;
+            // Convert thumbnail URLs to high resolution
+            // _AC_US40_ → 40px thumb → _AC_SL1500_ → 1500px wide
+            // _AC_SY88_ → 88px tall → remove size constraint
+            src = src
+                .replace(/_AC_US\d+_/, '_AC_SL1500_')
+                .replace(/_AC_SY\d+_/, '_AC_SL1500_')
+                .replace(/_AC_MP\d+_/, '_AC_SL1500_')
+                .replace(/_SX\d+_/, '_SX1500_')
+                .replace(/_SY\d+_/, '_SY1500_')
+                .replace(/,_SX\d+_,/, ',_SX1500_,')
+                .replace(/\._[^_]+_\./, '._AC_SL1500_.');
+            if (!seen.has(src)) {
                 seen.add(src);
                 data.images.push(src);
             }
@@ -337,11 +349,33 @@
         // Images
         if (data.images.length > 0) {
             const sec = addSection('🖼️', 'Images');
-            data.images.forEach(src => {
+            data.images.forEach((src, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:6px;';
+
                 const img = document.createElement('img');
                 img.src = src;
                 img.className = 'ext-img';
-                sec.appendChild(img);
+                img.style.cssText = 'width:60px;height:60px;object-fit:contain;flex-shrink:0;cursor:pointer;border:1px solid #ddd;border-radius:4px;padding:2px;';
+                img.title = 'Click to open full size';
+                img.onclick = () => window.open(src, '_blank');
+
+                const info = document.createElement('div');
+                info.style.cssText = 'flex:1;min-width:0;';
+                const fname = document.createElement('div');
+                fname.style.cssText = 'font-size:11px;color:#333;word-break:break-all;';
+                fname.textContent = `Image ${idx + 1}: ${src.split('/').pop()}`;
+                const openLink = document.createElement('a');
+                openLink.href = src;
+                openLink.target = '_blank';
+                openLink.textContent = 'Open full size →';
+                openLink.style.cssText = 'font-size:11px;color:#0066c0;text-decoration:none;';
+                info.appendChild(fname);
+                info.appendChild(openLink);
+
+                row.appendChild(img);
+                row.appendChild(info);
+                sec.appendChild(row);
             });
         }
 
@@ -375,8 +409,28 @@
         textBtn.textContent = '📄 Copy as Text';
         textBtn.onclick = () => copyText(toText(data), textBtn);
 
+        const imgBtn = document.createElement('button');
+        imgBtn.id = 'btn-copy-images';
+        imgBtn.textContent = '🖼️ Open All Images';
+        imgBtn.onclick = () => {
+            if (data.images.length === 0) return;
+            data.images.forEach((src, i) => {
+                setTimeout(() => window.open(src, '_blank'), i * 300);
+            });
+            flash(imgBtn);
+        };
+
+        const imgUrlBtn = document.createElement('button');
+        imgUrlBtn.id = 'btn-copy-img-urls';
+        imgUrlBtn.textContent = '📎 Copy Image URLs';
+        imgUrlBtn.onclick = () => {
+            copyText(data.images.join('\n'), imgUrlBtn);
+        };
+
         btnRow.appendChild(jsonBtn);
         btnRow.appendChild(textBtn);
+        btnRow.appendChild(imgBtn);
+        btnRow.appendChild(imgUrlBtn);
 
         // Assemble
         panel.appendChild(header);

@@ -83,6 +83,8 @@
 
     function extractAllData() {
         const data = {};
+        data.accordionSections = {};
+        data.reviews = { overall: '', totalCount: '', starDistribution: {}, topReviews: [] };
 
         // Title
         data.title = st(document.querySelector('#productTitle'));
@@ -163,6 +165,65 @@
             });
             if (Object.keys(data.technicalDetails).length > 0) break;
         }
+
+
+        // --- Collapsed/Accordion Sections (Features & Specs, Materials, Measurements, etc.) ---
+        data.accordionSections = {};
+        const accordionSelectors = [
+            '#detailBullets_feature_div',
+            '#detailBulletsWrapper_feature_div',
+            '#productDetails_superpositionDiv',
+            '#productDetails_techSpec_section_1',
+            'div[data-action="a-expander"]',
+            '.a-expander-content',
+            '#productDetails_Overview_section1',
+        ];
+        for (const sel of accordionSelectors) {
+            const el = document.querySelector(sel);
+            if (!el) continue;
+            const headers = el.querySelectorAll('h3, h4, .a-expander-header, [data-action="a-expander"]');
+            headers.forEach(header => {
+                const title = st(header).trim();
+                if (!title || title.length > 120) return;
+                let content = '';
+                let sibling = header.nextElementSibling;
+                while (sibling && content.length < 2000) {
+                    const text = st(sibling).trim();
+                    if (text && !text.includes('{') && !text.includes('function')) content += text + '
+';
+                    sibling = sibling.nextElementSibling;
+                    if (sibling && (sibling.tagName === 'H3' || sibling.tagName === 'H4' || sibling.querySelector('.a-expander-header'))) break;
+                }
+                if (content.trim().length > 3) data.accordionSections[title] = content.trim().substring(0, 1000);
+            });
+            if (Object.keys(data.accordionSections).length > 0) break;
+        }
+
+        // --- Customer Reviews ---
+        data.reviews = { overall: data.rating, totalCount: data.reviewCount, starDistribution: {}, topReviews: [] };
+        const histogram = document.querySelector('#cm_cr_dp_d_rating_histogram');
+        if (histogram) {
+            const bars = histogram.querySelectorAll('.a-meter');
+            bars.forEach((bar, idx) => {
+                const pct = bar.getAttribute('aria-label') || '';
+                const stars = 5 - idx;
+                data.reviews.starDistribution[stars + ' stars'] = pct || '';
+            });
+        }
+        const reviewCards = document.querySelectorAll('[data-hook="review"], .review, #cm_cr_reviews_list .a-section');
+        reviewCards.forEach((card, idx) => {
+            if (idx >= 5) return;
+            const r = {};
+            const starEl = card.querySelector('[data-hook="review-star-rating"], .a-icon-alt, .a-icon-star');
+            r.rating = starEl ? st(starEl).trim() : '';
+            const titleEl = card.querySelector('[data-hook="review-title"], .review-title');
+            r.title = titleEl ? st(titleEl).trim() : '';
+            const bodyEl = card.querySelector('[data-hook="review-body"], .review-text, .a-expander-content');
+            r.body = bodyEl ? st(bodyEl).trim().substring(0, 300) : '';
+            const authorEl = card.querySelector('[data-hook="review-author"], .a-profile-name');
+            r.author = authorEl ? st(authorEl).trim() : '';
+            if (r.body || r.title) data.reviews.topReviews.push(r);
+        });
 
         // Description
         const descEl = document.querySelector('#productDescription_feature_div') || document.querySelector('#productDescription');
@@ -328,6 +389,68 @@
             techSec.appendChild(tbl);
         }
 
+        // Accordion/Collapsed Sections
+        if (Object.keys(data.accordionSections).length > 0) {
+            const accSec = addSection('📑', 'Product Details');
+            const accBox = document.createElement('div');
+            accBox.className = 'ext-desc-box';
+            let accText = '';
+            for (const [title, content] of Object.entries(data.accordionSections)) {
+                accText += '[' + title + ']\n' + content + '\n\n';
+            }
+            accBox.textContent = accText.trim().substring(0, 2000);
+            accSec.appendChild(accBox);
+        }
+
+        // Customer Reviews
+        if (data.reviews.topReviews.length > 0 || Object.keys(data.reviews.starDistribution).length > 0) {
+            const revSec = addSection('⭐', 'Customer Reviews (' + data.reviews.totalCount + ')');
+
+            // Star distribution
+            if (Object.keys(data.reviews.starDistribution).length > 0) {
+                const distDiv = document.createElement('div');
+                distDiv.style.cssText = 'margin-bottom:8px;font-size:12px;';
+                for (const [stars, pct] of Object.entries(data.reviews.starDistribution)) {
+                    const row = document.createElement('div');
+                    row.style.cssText = 'display:flex;align-items:center;gap:4px;margin-bottom:2px;';
+                    row.innerHTML = '<span style="width:50px;color:#666;">' + stars + '</span><span style="flex:1;background:#eee;height:8px;border-radius:4px;overflow:hidden;"><div style="width:' + pct + ';height:100%;background:#FFA726;border-radius:4px;"></div></span><span style="width:40px;color:#666;font-size:11px;">' + pct + '</span>';
+                    distDiv.appendChild(row);
+                }
+                revSec.appendChild(distDiv);
+            }
+
+            // Top reviews
+            data.reviews.topReviews.forEach(r => {
+                const revDiv = document.createElement('div');
+                revDiv.style.cssText = 'border-top:1px solid #eee;padding-top:8px;margin-top:8px;';
+                if (r.rating) {
+                    const rBar = document.createElement('div');
+                    rBar.style.cssText = 'color:#FFA726;font-size:12px;margin-bottom:2px;';
+                    rBar.textContent = r.rating;
+                    revDiv.appendChild(rBar);
+                }
+                if (r.title) {
+                    const rTitle = document.createElement('div');
+                    rTitle.style.cssText = 'font-weight:600;font-size:13px;margin-bottom:2px;';
+                    rTitle.textContent = r.title;
+                    revDiv.appendChild(rTitle);
+                }
+                if (r.author) {
+                    const rAuthor = document.createElement('div');
+                    rAuthor.style.cssText = 'font-size:11px;color:#888;margin-bottom:2px;';
+                    rAuthor.textContent = r.author;
+                    revDiv.appendChild(rAuthor);
+                }
+                if (r.body) {
+                    const rBody = document.createElement('div');
+                    rBody.style.cssText = 'font-size:12px;color:#555;line-height:1.5;';
+                    rBody.textContent = r.body;
+                    revDiv.appendChild(rBody);
+                }
+                revSec.appendChild(revDiv);
+            });
+        }
+
         // Description
         if (data.description) {
             const sec = addSection('📝', 'Description');
@@ -397,6 +520,8 @@
                 title: data.title, brand: data.brand, price: data.price,
                 rating: data.rating, reviewCount: data.reviewCount, asin: data.asin,
                 keyFeatures: data.keyFeatures, technicalDetails: data.technicalDetails,
+                accordionSections: data.accordionSections,
+                reviews: data.reviews,
                 description: data.description.substring(0, 1000),
                 aboutThisItem: data.aboutThisItem ? data.aboutThisItem.substring(0, 1000) : '',
                 images: data.images, url: data.url
@@ -473,6 +598,30 @@
             t += '--- Technical Details ---\n';
             for (const [k, v] of Object.entries(d.technicalDetails)) t += k + ': ' + v + '\n';
             t += '\n';
+        }
+        if (Object.keys(d.accordionSections).length) {
+            t += '--- Product Details (Accordion) ---\n';
+            for (const [title, content] of Object.entries(d.accordionSections)) {
+                t += '[' + title + ']\n' + content + '\n\n';
+            }
+        }
+        if (d.reviews.topReviews.length || Object.keys(d.reviews.starDistribution).length) {
+            t += '--- Customer Reviews ---\n';
+            t += 'Overall: ' + d.reviews.overall + ' (' + d.reviews.totalCount + ')\n';
+            if (Object.keys(d.reviews.starDistribution).length) {
+                t += 'Star Distribution:\n';
+                for (const [stars, pct] of Object.entries(d.reviews.starDistribution)) {
+                    t += '  ' + stars + ': ' + pct + '\n';
+                }
+                t += '\n';
+            }
+            d.reviews.topReviews.forEach(r => {
+                t += 'Review: ' + (r.title || 'No title') + '\n';
+                if (r.rating) t += 'Rating: ' + r.rating + '\n';
+                if (r.author) t += 'By: ' + r.author + '\n';
+                if (r.body) t += r.body + '\n';
+                t += '\n';
+            });
         }
         if (d.description) t += '--- Description ---\n' + d.description.substring(0, 1500) + '\n\n';
         if (d.aboutThisItem) t += '--- About This Item ---\n' + d.aboutThisItem.substring(0, 1500) + '\n\n';

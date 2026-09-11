@@ -168,86 +168,277 @@
 
 
         // --- Collapsed/Accordion Sections (Features & Specs, Materials, Measurements, etc.) ---
+        // Strategy: try multiple approaches
+        // 1) Look for expander-content directly
+        // 2) Try to expand hidden panels by clicking headers
+        // 3) Fall back to known ID containers
         data.accordionSections = {};
-        const accordionSelectors = [
-            '#detailBullets_feature_div',
-            '#detailBulletsWrapper_feature_div',
-            '#productDetails_superpositionDiv',
-            '#productDetails_techSpec_section_1',
-            'div[data-action="a-expander"]',
-            '.a-expander-content',
-            '#productDetails_Overview_section1',
+
+        // Helper: extract text from an element, filtering out CSS/JS noise
+        function getCleanText(el, maxLen) {
+            if (!el) return '';
+            // If the element is hidden (display:none or visibility:hidden), we still want its text
+            const text = el.textContent || '';
+            const lines = text.split('\n')
+                .map(l => l.trim())
+                .filter(l => l.length > 2 &&
+                    !l.includes('function') &&
+                    !l.includes('{') &&
+                    !l.includes('}') &&
+                    !l.includes('var ') &&
+                    !l.includes('const ') &&
+                    !l.includes('window.') &&
+                    !l.includes('ue.track') &&
+                    !l.match(/^[\s\W]*$/) // skip lines that are only whitespace/symbols
+                );
+            return lines.join('\n').trim().substring(0, maxLen || 1500);
+        }
+
+        // Try to expand collapsed accordion panels first
+        tryExpandAccordions();
+
+        // Approach 1: Find all a-expander-content blocks (expanded or not)
+        const expanderContents = document.querySelectorAll('.a-expander-content');
+        expanderContents.forEach(contentEl => {
+            // Find the nearest header/title
+            const wrapper = contentEl.closest('[data-action="a-expander"]') ||
+                           contentEl.closest('.a-expander-wrapper') ||
+                           contentEl.parentElement;
+            let title = '';
+            if (wrapper) {
+                const headerEl = wrapper.querySelector('.a-expander-header, h3, h4, h2');
+                if (headerEl) title = getCleanText(headerEl, 100);
+            }
+            const contentText = getCleanText(contentEl, 1000);
+            if (contentText.length > 3 && title.length > 1) {
+                data.accordionSections[title] = contentText;
+            }
+        });
+
+        // Approach 2: Try structured selectors for product details
+        const detailSelectors = [
+            { selector: '#productDetails_techSpec_section_1', title: 'Technical Specifications' },
+            { selector: '#productDetails_detailBullets_sections1', title: 'Product Details' },
+            { selector: '#detailBullets_feature_div', title: 'Product Details' },
+            { selector: '#detailBulletsWrapper_feature_div', title: 'Product Details' },
+            { selector: '#productDetails_Overview_section1', title: 'Product Description' },
+            { selector: '#productDetails_superpositionDiv', title: 'Additional Information' },
         ];
-        for (const sel of accordionSelectors) {
-            const el = document.querySelector(sel);
-            if (!el) continue;
-            const headers = el.querySelectorAll('h3, h4, .a-expander-header, [data-action="a-expander"]');
-            headers.forEach(header => {
-                const title = st(header).trim();
-                if (!title || title.length > 120) return;
-                let content = '';
-                let sibling = header.nextElementSibling;
-                while (sibling && content.length < 2000) {
-                    const text = st(sibling).trim();
-                    if (text && !text.includes('{') && !text.includes('function')) content += text + '\n';
-                    sibling = sibling.nextElementSibling;
-                    if (sibling && (sibling.tagName === 'H3' || sibling.tagName === 'H4' || sibling.querySelector('.a-expander-header'))) break;
+        detailSelectors.forEach(({ selector, title }) => {
+            if (Object.keys(data.accordionSections).length > 5) return; // already have enough
+            const el = document.querySelector(selector);
+            if (!el) return;
+            const text = getCleanText(el, 1500);
+            if (text.length > 10) {
+                // Avoid duplicate titles
+                const key = title + ' (' + selector.replace(/#/g, '') + ')';
+                data.accordionSections[key] = text;
+            }
+        });
+
+        // Approach 3: Search for any table with key-value pairs (a-keyvalue)
+        document.querySelectorAll('table.a-keyvalue').forEach(table => {
+            if (Object.keys(data.accordionSections).length > 8) return;
+            let rows = {};
+            table.querySelectorAll('tr').forEach(row => {
+                const th = row.querySelector('th');
+                const td = row.querySelector('td');
+                if (th && td) {
+                    const k = getCleanText(th, 60);
+                    const v = getCleanText(td, 200);
+                    if (k && v) rows[k] = v;
                 }
-                if (content.trim().length > 3) data.accordionSections[title] = content.trim().substring(0, 1000);
             });
-            if (Object.keys(data.accordionSections).length > 0) break;
+            if (Object.keys(rows).length > 1) {
+                let text = Object.entries(rows).map(([k, v]) => k + ': ' + v).join('\n');
+                data.accordionSections['Specifications Table'] = text;
+            }
+        });
+
+        // Helper: try to click accordion headers to expand hidden content
+        function tryExpandAccordions() {
+            try {
+                const headers = document.querySelectorAll('.a-expander-header, [data-action="a-expander"]');
+                headers.forEach(header => {
+                    // Check if the associated content is hidden
+                    const wrapper = header.closest('[data-action="a-expander"]') ||
+                                   header.parentElement;
+                    const content = wrapper ? wrapper.querySelector('.a-expander-content') : null;
+                    if (content) {
+                        const style = window.getComputedStyle(content);
+                        const isHidden = style.display === 'none' || style.visibility === 'hidden' ||
+                                        content.offsetHeight === 0;
+                        if (isHidden) {
+                            header.click();
+                        }
+                    }
+                });
+            } catch(e) {
+                // Silently fail - expanding is best-effort
+            }
         }
 
         // --- Customer Reviews ---
         data.reviews = { overall: data.rating, totalCount: data.reviewCount, starDistribution: {}, topReviews: [] };
-        const histogram = document.querySelector('#cm_cr_dp_d_rating_histogram');
+
+        // Star distribution histogram
+        const histogram = document.querySelector('#cm_cr_dp_d_rating_histogram') ||
+                          document.querySelector('.cr-widget-Histogram') ||
+                          document.querySelector('[data-hook="rating-count"]');
         if (histogram) {
-            const bars = histogram.querySelectorAll('.a-meter');
-            bars.forEach((bar, idx) => {
-                const pct = bar.getAttribute('aria-label') || '';
-                const stars = 5 - idx;
-                data.reviews.starDistribution[stars + ' stars'] = pct || '';
+            // Try aria-label on bars
+            histogram.querySelectorAll('.a-meter, [aria-label*="star"]').forEach((bar, idx) => {
+                const label = bar.getAttribute('aria-label') || '';
+                const stars = label.match(/(\d)\s*star/i);
+                if (stars) {
+                    const starCount = stars[1];
+                    const pctMatch = label.match(/(\d+)%/);
+                    data.reviews.starDistribution[starCount + ' stars'] = pctMatch ? pctMatch[1] + '%' : '';
+                }
             });
+            // Try 2D histogram bars
+            if (Object.keys(data.reviews.starDistribution).length === 0) {
+                const bars = histogram.querySelectorAll('a, .a-size-base');
+                bars.forEach(bar => {
+                    const text = getCleanText(bar, 50);
+                    const match = text.match(/^(\d)\s*★?\s*\(?(\d+)%\)?$/);
+                    if (match) {
+                        data.reviews.starDistribution[match[1] + ' stars'] = match[2] + '%';
+                    }
+                });
+            }
         }
-        const reviewCards = document.querySelectorAll('[data-hook="review"], .review, #cm_cr_reviews_list .a-section');
+
+        // Try to find star distribution from review summary text
+        if (Object.keys(data.reviews.starDistribution).length === 0) {
+            const reviewSummary = document.querySelector('#reviewSummary') ||
+                                  document.querySelector('[data-hook="review-summary"]') ||
+                                  document.querySelector('.a-section.review-summary');
+            if (reviewSummary) {
+                const summaryText = getCleanText(reviewSummary, 500);
+                const starMatches = summaryText.match(/(\d)\s*stars?\s*\(?\s*(\d+%?)\s*\)?/gi);
+                if (starMatches) {
+                    starMatches.forEach(m => {
+                        const match = m.match(/(\d)\s*stars?\s*\(?\s*(\d+%?)\s*\)?/i);
+                        if (match) data.reviews.starDistribution[match[1] + ' stars'] = match[2];
+                    });
+                }
+            }
+        }
+
+        // Extract top reviews
+        const reviewSelectors = [
+            '[data-hook="review"]',
+            '#cm_cr_reviews_list .a-section',
+            '[data-hook="review-list"] [data-hook="review"]',
+            '.review-item',
+            '.a-section[data-csa-c-content-id*="review"]',
+        ];
+        let reviewCards = [];
+        for (const sel of reviewSelectors) {
+            reviewCards = document.querySelectorAll(sel);
+            if (reviewCards.length > 0) break;
+        }
+
         reviewCards.forEach((card, idx) => {
             if (idx >= 5) return;
             const r = {};
-            const starEl = card.querySelector('[data-hook="review-star-rating"], .a-icon-alt, .a-icon-star');
-            r.rating = starEl ? st(starEl).trim() : '';
-            const titleEl = card.querySelector('[data-hook="review-title"], .review-title');
-            r.title = titleEl ? st(titleEl).trim() : '';
-            const bodyEl = card.querySelector('[data-hook="review-body"], .review-text, .a-expander-content');
-            r.body = bodyEl ? st(bodyEl).trim().substring(0, 300) : '';
-            const authorEl = card.querySelector('[data-hook="review-author"], .a-profile-name');
-            r.author = authorEl ? st(authorEl).trim() : '';
+
+            // Star rating
+            const starEl = card.querySelector('[data-hook="review-star-rating"], .a-icon-alt, .a-icon-star, i.a-icon-star');
+            r.rating = starEl ? (starEl.getAttribute('aria-label') || getCleanText(starEl, 30)).trim() : '';
+
+            // Review title
+            const titleEl = card.querySelector('[data-hook="review-title"], .review-title, h5, [data-hook="review-title-link"]');
+            r.title = titleEl ? getCleanText(titleEl, 200).trim() : '';
+
+            // Review body
+            const bodyEl = card.querySelector('[data-hook="review-body"], .review-text, .a-expander-content, .a-section.review-data');
+            r.body = bodyEl ? getCleanText(bodyEl, 400).trim() : '';
+
+            // Author
+            const authorEl = card.querySelector('[data-hook="review-author"], .a-profile-name, .review-byline');
+            r.author = authorEl ? getCleanText(authorEl, 80).trim() : '';
+
+            // Date
+            const dateEl = card.querySelector('[data-hook="review-date"], .review-date');
+            r.date = dateEl ? getCleanText(dateEl, 40).trim() : '';
+
+            // Verified purchase
+            const verifiedEl = card.querySelector('[data-hook="avp-badge"], .a-size-base.a-color-secondary');
+            if (verifiedEl && getCleanText(verifiedEl, 50).toLowerCase().includes('verified')) {
+                r.verified = 'Verified Purchase';
+            }
+
             if (r.body || r.title) data.reviews.topReviews.push(r);
         });
 
-        // Description
-        const descEl = document.querySelector('#productDescription_feature_div') || document.querySelector('#productDescription');
-        if (descEl) {
-            // Filter out style/script content
-            const parts = [];
-            descEl.childNodes.forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const t = node.textContent.trim();
-                    if (t.length > 15) parts.push(t);
-                } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'STYLE' && node.tagName !== 'SCRIPT') {
-                    const t = st(node).trim();
-                    if (t.length > 15 && !t.includes('{')) parts.push(t);
+        // If no individual reviews found, try to get the "Top reviews from United States" section
+        if (data.reviews.topReviews.length === 0) {
+            const topReviewsSection = document.querySelector('#cm_cr_top_customer_reviews') ||
+                                      document.querySelector('[data-hook="top-customer-reviews"]');
+            if (topReviewsSection) {
+                const reviewText = getCleanText(topReviewsSection, 3000);
+                if (reviewText.length > 50) {
+                    data.reviews.rawTopReviews = reviewText.substring(0, 2000);
                 }
-            });
-            data.description = parts.join('\n\n').substring(0, 2000);
+            }
         }
 
-        // About This Item
-        const aboutEl = document.querySelector('#aplus_feature_div, #aplus3p_feature_div, #aplus_feature_deck');
-        if (aboutEl) {
-            const t = st(aboutEl);
-            // Filter CSS/JS
-            const lines = t.split('\n').filter(l => !l.includes('{') && !l.includes('}') && !l.includes('function') && l.trim().length > 3);
-            data.aboutThisItem = lines.join('\n').trim().substring(0, 3000);
+        // Description - try multiple selectors and strategies
+        data.description = '';
+        const descSelectors = [
+            '#productDescription_feature_div',
+            '#productDescription',
+            '#aplus_feature_div',
+            '#aplus3p_feature_div',
+            '#feature-bullets',
+            '[data-feature-name="product-highlights"]',
+        ];
+        for (const sel of descSelectors) {
+            if (data.description.length > 100) break;
+            const descEl = document.querySelector(sel);
+            if (!descEl) continue;
+            const text = getCleanText(descEl, 2500);
+            if (text.length > 50) {
+                data.description = text;
+                break;
+            }
+        }
+
+        // About This Item / A+ Content
+        data.aboutThisItem = '';
+        const aboutSelectors = [
+            '#aplus_feature_div',
+            '#aplus3p_feature_div',
+            '#aplus_feature_deck',
+            '#aplus',
+        ];
+        for (const sel of aboutSelectors) {
+            if (data.aboutThisItem.length > 100) break;
+            const aboutEl = document.querySelector(sel);
+            if (!aboutEl) continue;
+            const text = getCleanText(aboutEl, 3000);
+            if (text.length > 50) {
+                data.aboutThisItem = text;
+                break;
+            }
+        }
+        // About This Item: second pass with less aggressive filtering
+        if (!data.aboutThisItem || data.aboutThisItem.length < 50) {
+            const aplusEl = document.querySelector('#aplus_feature_div') ||
+                           document.querySelector('#aplus3p_feature_div');
+            if (aplusEl) {
+                const paragraphs = aplusEl.querySelectorAll('p, li, span.a-text-normal');
+                const parts = [];
+                paragraphs.forEach(p => {
+                    const t = getCleanText(p, 500);
+                    if (t.length > 10 && t.length < 500) parts.push(t);
+                });
+                if (parts.length > 0) {
+                    data.aboutThisItem = parts.join('\n\n').substring(0, 3000);
+                }
+            }
         }
 
         // Images - convert to highest resolution available
@@ -402,7 +593,7 @@
         }
 
         // Customer Reviews
-        if (data.reviews.topReviews.length > 0 || Object.keys(data.reviews.starDistribution).length > 0) {
+        if (data.reviews.topReviews.length > 0 || Object.keys(data.reviews.starDistribution).length > 0 || data.reviews.rawTopReviews) {
             const revSec = addSection('⭐', 'Customer Reviews (' + data.reviews.totalCount + ')');
 
             // Star distribution
@@ -440,6 +631,18 @@
                     rAuthor.textContent = r.author;
                     revDiv.appendChild(rAuthor);
                 }
+                if (r.date) {
+                    const rDate = document.createElement('div');
+                    rDate.style.cssText = 'font-size:11px;color:#888;margin-bottom:2px;';
+                    rDate.textContent = r.date;
+                    revDiv.appendChild(rDate);
+                }
+                if (r.verified) {
+                    const rVerified = document.createElement('div');
+                    rVerified.style.cssText = 'font-size:11px;color:#007600;margin-bottom:2px;';
+                    rVerified.textContent = '✓ ' + r.verified;
+                    revDiv.appendChild(rVerified);
+                }
                 if (r.body) {
                     const rBody = document.createElement('div');
                     rBody.style.cssText = 'font-size:12px;color:#555;line-height:1.5;';
@@ -448,6 +651,14 @@
                 }
                 revSec.appendChild(revDiv);
             });
+
+            // Show raw reviews text if no structured reviews found
+            if (data.reviews.topReviews.length === 0 && data.reviews.rawTopReviews) {
+                const rawBox = document.createElement('div');
+                rawBox.className = 'ext-desc-box';
+                rawBox.textContent = data.reviews.rawTopReviews;
+                revSec.appendChild(rawBox);
+            }
         }
 
         // Description
@@ -617,10 +828,15 @@
             d.reviews.topReviews.forEach(r => {
                 t += 'Review: ' + (r.title || 'No title') + '\n';
                 if (r.rating) t += 'Rating: ' + r.rating + '\n';
+                if (r.date) t += 'Date: ' + r.date + '\n';
                 if (r.author) t += 'By: ' + r.author + '\n';
+                if (r.verified) t += r.verified + '\n';
                 if (r.body) t += r.body + '\n';
                 t += '\n';
             });
+            if (d.reviews.rawTopReviews) {
+                t += '--- Raw Reviews Section ---\n' + d.reviews.rawTopReviews + '\n\n';
+            }
         }
         if (d.description) t += '--- Description ---\n' + d.description.substring(0, 1500) + '\n\n';
         if (d.aboutThisItem) t += '--- About This Item ---\n' + d.aboutThisItem.substring(0, 1500) + '\n\n';

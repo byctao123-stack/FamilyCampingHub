@@ -189,8 +189,7 @@
                 let sibling = header.nextElementSibling;
                 while (sibling && content.length < 2000) {
                     const text = st(sibling).trim();
-                    if (text && !text.includes('{') && !text.includes('function')) content += text + '
-';
+                    if (text && !text.includes('{') && !text.includes('function')) content += text + '\n';
                     sibling = sibling.nextElementSibling;
                     if (sibling && (sibling.tagName === 'H3' || sibling.tagName === 'H4' || sibling.querySelector('.a-expander-header'))) break;
                 }

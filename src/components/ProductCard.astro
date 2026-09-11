@@ -46,7 +46,6 @@ const {
         </div>
 
         <!-- Price -->
-        <div class='product-card-price'>{priceRange}</div>
 
         <!-- Key Features -->
         {features.length > 0 && (
@@ -115,21 +114,23 @@ const {
 
   /* Image Section */
   .product-card-image {
-    flex: 0 0 200px;
+    flex: 0 0 240px;
+    min-height: 220px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: #fff;
     border-radius: 8px;
-    padding: 16px;
+    padding: 0;
     margin-right: 20px;
+    overflow: hidden;
   }
 
   .product-card-image img {
-    max-width: 100%;
-    max-height: 180px;
-    object-fit: contain;
-    mix-blend-mode: multiply;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 
   /* Info Section */

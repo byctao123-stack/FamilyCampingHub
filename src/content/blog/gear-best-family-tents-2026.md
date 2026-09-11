@@ -7,7 +7,7 @@ pubDate: "2026-09-06"
 author: "Michael"
 category: "gear"
 readTime: 5
-featured: true
+featured: false
 imageUrl: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&h=500&fit=crop"
 imageAlt: "Family camping tent setup in a beautiful meadow"
 avatarUrl: "/images/avatars/1.webp"

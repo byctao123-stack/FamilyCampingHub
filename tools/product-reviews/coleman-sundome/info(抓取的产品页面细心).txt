@@ -1,0 +1,35 @@
+{
+  "title": "Coleman Sundome Camping Tent with Rainfly, 2/3/4/6 Person Tent Sets Up in 10 Mins, Weatherproof Shelter for Camping, Festivals, Backyard, Sleepovers, & More",
+  "brand": "Coleman",
+  "price": "$113.83",
+  "rating": "4.6 out of 5 stars",
+  "reviewCount": "(23,185)",
+  "asin": "B0D7QHY574",
+  "keyFeatures": [
+    "Polyester",
+    "Imported",
+    "Included rainfly offers extra weather protection",
+    "Strong frame withstands 35+ mph winds",
+    "Large windows and a ground vent for superior ventilation",
+    "E-Port makes it easy to bring electrical power inside",
+    "Easy setup in 10 minutes",
+    "Dimensions: 9 x 7 ft",
+    "Center height: 4 ft. 11 in",
+    "Fits 1 queen-size air bed"
+  ],
+  "technicalDetails": {
+    "Occupancy": "4 Person",
+    "Seasons": "3 Season",
+    "Water Resistance Technology": "Rainproof",
+    "Additional Features": "Rainproof, UV Protection",
+    "Installation Type": "Free Standing",
+    "Closure Type": "Buckle, Zipper",
+    "Water Resistance Level": "Water Resistant",
+    "Support Pole Attachment Mechanism": "Clip",
+    "Is Waterproof": "true",
+    "UV Protection": "Yes",
+    "Sport Type": "Camping & Hiking"
+  },
+  "aboutItem": "",
+  "url": "https://www.amazon.com/gp/product/B0D7QHY574/ref=ox_sc_act_image_1?smid=ATVPDKIKX0DER&th=1"
+}

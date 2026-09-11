@@ -93,9 +93,8 @@ const Blog = ({ blogData = [] }: BlogProps) => {
   const [selectedTab, setSelectedTab] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Filter out featured posts to avoid duplication with hero section
   // Sort posts by pubDate in descending order (newest first)
-  const nonFeaturedPosts = blogData.filter(post => !post.featured).sort((a, b) => b.pubDate.localeCompare(a.pubDate))
+  const nonFeaturedPosts = [...blogData].sort((a, b) => b.pubDate.localeCompare(a.pubDate))
 
   // Dynamically generate categories from the available data
   const uniqueCategories = [...new Set(nonFeaturedPosts.map(post => post.category))]

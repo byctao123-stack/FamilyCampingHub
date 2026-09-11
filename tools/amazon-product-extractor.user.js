@@ -20,8 +20,11 @@
     // Wait for Amazon's dynamic content to render
     setTimeout(showPanel, 2000);
 
-    // Also try again after longer delay in case first attempt misses lazy-loaded content
-    setTimeout(showPanel, 6000);
+    setTimeout(() => {
+        if (!document.getElementById('amazon-extractor-panel') && !document.getElementById('extractor-toggle')) {
+            showPanel();
+        }
+    }, 6000);
 
     function injectStyles() {
         if (document.getElementById('extractor-styles')) return;
@@ -55,7 +58,7 @@
             #btn-copy-text { background: #fff !important; border: 1px solid #ccc !important; }
             #extractor-toggle {
                 position: fixed !important; top: 10px !important; right: 10px !important; z-index: 999998 !important;
-                width: 48px !important; height: 48px !important; border-radius: 50% !important;
+                width: 56px !important; height: 56px !important; border-radius: 50% !important;
                 background: #FFD814 !important; border: 1px solid #F0C14B !important; font-size: 22px !important;
                 cursor: pointer !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
             }
@@ -199,6 +202,8 @@
             // Check inline style
             const style = el.getAttribute('style') || '';
             if (style.includes('display:none') || style.includes('display: none') || style.includes('position:absolute') && style.includes('left:-9999')) return true;
+            const txt = (el.textContent || '').substring(0, 200);
+            if (/[{]/.test(txt) && /"[a-zA-Z]+":/.test(txt)) return true;
             return false;
         }
 
@@ -255,6 +260,7 @@
                     if (cssProps / words > 0.25) return;
                     const symbolRatio = (text.match(/[^\w\s.,!?'"()\-\n]/g) || []).length / text.length;
                     if (symbolRatio > 0.25) return;
+                    if (text.includes('Video Player') || text.includes('Click to play') || text.includes('Playback Rate')) return;
                     parts.push(text);
                 }
             });
@@ -273,6 +279,11 @@
                     !l.includes('ue.track') &&
                     !l.includes('var ') &&
                     !l.includes('const ') &&
+                    !l.includes('videoUrl') &&
+                    !l.includes('parentAsin') &&
+                    !l.includes('Video Player') &&
+                    !l.includes('Click to play') &&
+                    !l.includes('Playback Rate') &&
                     !l.match(/^[^\w]*$/) // skip lines without any word characters
                 );
             return lines.join('\n').trim().substring(0, maxLen || 1500);
@@ -365,6 +376,20 @@
             }
         });
 
+        // --- Cleanup accordion sections ---
+        const uiLabels = ['See more', 'Show less', 'Show more', 'Hide', 'See less'];
+        for (const key of Object.keys(data.accordionSections)) {
+            if (uiLabels.includes(key.trim())) { delete data.accordionSections[key]; continue; }
+            if (key.includes('How customer reviews')) { delete data.accordionSections[key]; continue; }
+            let val = data.accordionSections[key];
+            if (val) {
+                const parts = val.split('\n\n').map(s => s.trim()).filter(s => s.length > 3);
+                const seen = new Set();
+                const unique = parts.filter(p => { if (seen.has(p)) return false; seen.add(p); return true; });
+                data.accordionSections[key] = unique.join('\n\n');
+            }
+        }
+
         // --- Customer Reviews ---
         data.reviews = { overall: data.rating, totalCount: data.reviewCount, starDistribution: {}, topReviews: [] };
 
@@ -389,11 +414,28 @@
                 const rows = histogram.querySelectorAll('tr, .a-histogram-row, li');
                 rows.forEach(row => {
                     const text = getCleanText(row, 100);
-                    const match = text.match(/(\d)\s*★?\s*\(?\s*(\d+)%\s*\)?/);
+                    const match = text.match(/([1-5])\s*★?\s*\(?\s*(\d+)%\s*\)?/);
                     if (match) {
                         data.reviews.starDistribution[match[1] + ' stars'] = match[2] + '%';
                     }
                 });
+            }
+
+            // Strategy 2b: Count histogram rows by position (5-star first, 1-star last)
+            if (Object.keys(data.reviews.starDistribution).length < 3) {
+                const histRows = histogram.querySelectorAll('tr, .a-histogram-row, li');
+                if (histRows.length >= 5) {
+                    const starLabels = ['5 stars', '4 stars', '3 stars', '2 stars', '1 stars'];
+                    histRows.forEach((row, i) => {
+                        if (i >= 5) return;
+                        const pctEl = row.querySelector('.a-text-right, td:last-child, span:last-child');
+                        if (pctEl) {
+                            const pctText = (pctEl.textContent || '').trim();
+                            const pctMatch = pctText.match(/(\d+)%/);
+                            if (pctMatch) data.reviews.starDistribution[starLabels[i]] = pctMatch[1] + '%';
+                        }
+                    });
+                }
             }
 
             // Strategy 3: Look for any link/text with star + percentage pattern
@@ -453,14 +495,18 @@
             r.body = '';
 
             // Strategy 1: Try aria-label (sometimes Amazon stores full text there)
-            const bodyEl = card.querySelector('[data-hook="review-body"], .review-text, .a-expander-content, .a-section.review-data');
+            const bodyEl = card.querySelector('span[data-hook="review-body"], div[data-hook="review-body"], .review-text, .a-expander-content .review-text, .a-section.review-data');
             if (bodyEl) {
                 // Try aria-label first (often contains full text when truncated)
                 const ariaText = bodyEl.getAttribute('aria-label') || '';
                 if (ariaText.length > 20) {
                     r.body = ariaText.trim().substring(0, 400);
                 }
-                // Try textContent
+                // Try innerText
+                if (!r.body) {
+                    r.body = (bodyEl.innerText || '').trim().substring(0, 400);
+                }
+                // Try textContent as last resort
                 if (!r.body) {
                     r.body = getCleanText(bodyEl, 400);
                 }
@@ -523,8 +569,10 @@
         // Description - try extracting from visible children to avoid CSS/JS noise
         data.description = '';
         const descSelectors = [
-            '#productDescription_feature_div',
-            '#productDescription',
+            '#feature-bullets',
+            '[data-feature-name="product-highlights"]',
+            '#summaryBullets_feature_div',
+            '#productOverview_feature_div',
             '#feature-bullets',
             '[data-feature-name="product-highlights"]',
             '#summaryBullets_feature_div',
@@ -601,7 +649,7 @@
         data.images = data.images.slice(0, 8);
 
         // ASIN
-        const asinMatch = window.location.pathname.match(/\/dp\/([A-Z0-9]{10})/);
+        const asinMatch = window.location.pathname.match(/\/dp\/([A-Z0-9]{10})/) || window.location.pathname.match(/\/product\/([A-Z0-9]{10})/);
         data.asin = asinMatch ? asinMatch[1] : '';
 
         // URL
@@ -910,10 +958,23 @@
 
         // Also show a floating toggle button
         showToggleBtn();
+
+        // Keyboard shortcut: Ctrl+Shift+X
+        if (!window._extractorKeyHandler) {
+            window._extractorKeyHandler = function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+                    e.preventDefault();
+                    var p = document.getElementById('amazon-extractor-panel');
+                    if (p) { p.style.display = 'flex'; } else { showPanel(); }
+                }
+            };
+            document.addEventListener('keydown', window._extractorKeyHandler);
+        }
     }
 
     function showToggleBtn() {
-        if (document.getElementById('extractor-toggle')) return;
+        var existing = document.getElementById('extractor-toggle');
+        if (existing) { existing.style.display = 'block'; return; }
         const btn = document.createElement('button');
         btn.id = 'extractor-toggle';
         btn.textContent = '📦';

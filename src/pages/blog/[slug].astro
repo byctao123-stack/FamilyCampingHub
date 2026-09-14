@@ -167,6 +167,23 @@ const schema = {
               )
             }
 
+            <!-- Second Product Card (for comparison articles) -->
+            {
+              entry.data.secondProductCard && (
+                <ProductCard
+                  title={entry.data.secondProductCard.title}
+                  imageUrl={entry.data.secondProductCard.imageUrl}
+                  imageAlt={entry.data.secondProductCard.imageAlt}
+                  rating={entry.data.secondProductCard.rating}
+                  reviewCount={entry.data.secondProductCard.reviewCount}
+                  priceRange={entry.data.secondProductCard.priceRange}
+                  features={entry.data.secondProductCard.features}
+                  affiliateUrl={entry.data.secondProductCard.affiliateUrl}
+                  badge={entry.data.secondProductCard.badge}
+                />
+              )
+            }
+
             <!-- Post Navigation -->
             <div class='flex w-full justify-between pt-8'>
               {

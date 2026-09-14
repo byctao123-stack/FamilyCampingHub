@@ -7,7 +7,7 @@ pubDate: "2026-09-04"
 author: "Michael"
 category: "camp-life"
 readTime: 5
-featured: true
+featured: false
 imageUrl: "/images/articles/lifestyle-campfire-recipes/hero.jpg"
 imageAlt: "Family gathered around a warm campfire at dusk"
 avatarUrl: "/images/avatars/1.webp"

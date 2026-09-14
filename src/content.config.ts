@@ -27,6 +27,17 @@ const blog = defineCollection({
       features: z.array(z.string()).optional(),
       affiliateUrl: z.string().url(),
       badge: z.string().optional()
+    }).optional(),
+    secondProductCard: z.object({
+      title: z.string(),
+      imageUrl: z.string(),
+      imageAlt: z.string(),
+      rating: z.string().optional(),
+      reviewCount: z.string().optional(),
+      priceRange: z.string(),
+      features: z.array(z.string()).optional(),
+      affiliateUrl: z.string().url(),
+      badge: z.string().optional()
     }).optional()
   })
 })

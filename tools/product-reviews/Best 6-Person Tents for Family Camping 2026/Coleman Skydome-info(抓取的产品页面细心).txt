@@ -1,0 +1,35 @@
+{
+  "title": "Coleman Skydome Camping Tent with 5 Minute Setup, 2/4/6/8 Person Weatherproof Tent with Rainfly & Carry Bag, 20% More Headroom Than Traditional Canopies",
+  "brand": "Coleman",
+  "price": "$179.99",
+  "rating": "4.3 out of 5 stars",
+  "reviewCount": "(441)",
+  "asin": "B0D7QL1LHC",
+  "keyFeatures": [
+    "Sets up in under 5 minutes thanks to pre-attached poles",
+    "Nearly vertical walls offer 20% more headroom than traditional Coleman dome tents",
+    "WeatherTec system's welded corners and inverted seams help keep water from getting in",
+    "Strong frame has been tested to withstand up to 35 mph winds",
+    "Wider door makes it easier to move air beds, sleeping bags, and other gear in and out of the tent",
+    "Mesh storage pockets and a gear loft keep small items organized",
+    "Dimensions: 10 x 8 ft. 6 in",
+    "Center height: 6 ft",
+    "Fits 2 queen-size air beds",
+    "Carry bag included for easy storage"
+  ],
+  "technicalDetails": {
+    "Occupancy": "6 Person",
+    "Seasons": "3 Season",
+    "Water Resistance Technology": "WeatherTec",
+    "Additional Features": "Rainproof, UV Protection",
+    "Installation Type": "Free Standing",
+    "Closure Type": "Buckle, Zipper",
+    "Water Resistance Level": "Water Resistant",
+    "Support Pole Attachment Mechanism": "Pre-Attached",
+    "Is Waterproof": "true",
+    "Sport Type": "Backpacking, Camping & Hiking"
+  },
+  "aboutItem": "Chapters Descriptions Captions English (Automated) WeatherTec System Dark Room Technology Screen Room Feature",
+  "url": "https://www.amazon.com/Coleman-4-Person-Weatherproof-Headroom-Traditional/dp/B0D7QL1LHC/ref=sr_1_1?dib=eyJ2IjoiMSJ9.O2nH7G6TYQIFrD5lsQIuZJdCQtr13_A9rPnvsYYiKCmNBdLm1JL1grMgiQLGk1T3vFwdrxynnD8UbWCeCljxImHkkF8srYm2q5v6x4tiPp5vwOEPL3ocn4lOCdgyW0zJJt0L-w8ldPcaRtAaGwPSpSl2my8CBFhchWJiAeQuGCXUY1zA9ZzE1K-h5cTvsMRxqKuSKx202bBfeRc_CAavq6sa3LXmyc7fcLtRdPteCCo.vxq7T--NrXaPiShBv9Bpul0nA8QVc9XUK2rRTfzx4E0&dib_tag=se&keywords=Coleman%2BSky%2BDome&qid=1789371470&sr=8-1&th=1"
+}
+

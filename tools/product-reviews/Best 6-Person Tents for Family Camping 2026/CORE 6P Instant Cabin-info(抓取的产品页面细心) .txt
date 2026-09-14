@@ -1,0 +1,31 @@
+{
+  "title": "CORE Instant Cabin Tents | Family Cabin Multi Room Pop Up Tents Car Camping | Included Storage Pockets for Camping Accessories",
+  "brand": "CORE",
+  "price": "$199.99",
+  "rating": "4.4 out of 5 stars",
+  "reviewCount": "(584)",
+  "asin": "B08CJJRHH6",
+  "keyFeatures": [
+    "Imported",
+    "INSTANT POP UP TECHNOLOGY: Pre-attached poles lock into place for setup in 60 seconds or less",
+    "SLEEPING CAPACITY: Measures 11 by 9 feet with a 72-inch center height; fits two queen-size air beds; comfortably accommodates 3 people with gear or up to 6 people without gear",
+    "WEATHER PROTECTION: H20 Block Technology with 1200mm fabric, fully taped rainfly, sealed seams, and fully zipped windows; includes guylines and steel stakes for enhanced stability",
+    "INTERIOR ORGANIZATION: Features a hanging organizer and gear loft to keep small items and accessories within reach and off the floor",
+    "ADJUSTABLE VENTILATION: Lower vents bring in cool air from the ground, while the mesh ceiling allows hot air to escape",
+    "PACK SIZE: 47\" L x 9\" W x 9\" H; Weight: 23 lbs (10.4 kg)"
+  ],
+  "technicalDetails": {
+    "Occupancy": "6 Person",
+    "Seasons": "3 Season, Fall, Spring, Summer",
+    "Water Resistance Technology": "1200mm",
+    "Additional Features": "Pop Up, Portable",
+    "Installation Type": "Hanging",
+    "Closure Type": "Zipper",
+    "Water Resistance Level": "Water Resistant",
+    "Support Pole Attachment Mechanism": "Pre-Attached",
+    "Is Waterproof": "True",
+    "Sport Type": "Camping & Hiking"
+  },
+  "aboutItem": "Product description SLEEP CAPACITY FEATURES TECH SPECS SETUP Chapters Descriptions Captions Like What You See? Checkout Our Other CORE Tents Instant Tent Add to Cart Dome Tent Instant Lighted Tent Instant Blackout Tent Instant Full Rainfly Tent Straight Wall Cabin Tent Customer Reviews 4.4 out of 5 stars 4.1 out of 5 stars 4.6 out of 5 stars 4.5 out of 5 stars Price Capacity 6 Person 9 Person 10 Person Setup Instant Traditional Style Cabin Dome Dimensions 11 ft x 9 ft 10 ft x 9 ft 14 ft x 9 ft 14 ft x 10 ft Sleep Area 99 sq ft 90 sq ft 126 sq ft 140 sq ft Center Height 72 in 66 in 78 in 86 in Lighted Pack Size 47 in x 9 in x 9 in 25 in x 12 in x 6 in 46 in x 10 in x 10 in 48 in x 11 in x 11 in 30 in x 13 in x 13 in",
+  "url": "https://www.amazon.com/CORE-Person-Instant-Cabin-Organizer/dp/B08CJJRHH6/ref=sr_1_1?crid=1K4I1QMDRMLE6&dib=eyJ2IjoiMSJ9.opzktsMjeOgYoifJwAW9dZ1vidYNQcSmYxRwSKZgDWuZ4obJsN_s0nko4x65hRsFKKsTerpxGPRgI4CIq9esYsMzPmpfqUz6ryhqMjMxkPQ.m-rzHY-t0QgEMRCZfjNY60PlN9E4M5krBfWaCVkCqXU&dib_tag=se&keywords=CORE%2B6P%2BInstant%2BCabin&qid=1789373185&sprefix=core%2B6p%2Binstant%2Bcabin%2Caps%2C416&sr=8-1&th=1"
+}

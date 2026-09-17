@@ -7,7 +7,7 @@ import react from '@astrojs/react'
 
 export default defineConfig({
   site: 'https://familycampinghub.shop/',
-  trailingSlash: 'always',
+  trailingSlash: 'ignore',
   integrations: [
     react(),
     mdx(),
@@ -15,6 +15,10 @@ export default defineConfig({
       filter: page => !page.includes('/admin/') && !page.includes('/private/'),
       customPages: [],
       serialize(item) {
+        // Ensure all URLs end with trailing slash
+        if (!item.url.endsWith('/')) {
+          item.url += '/'
+        }
         // Homepage - highest priority
         if (item.url.endsWith('/') && item.url.split('/').filter(Boolean).length === 0) {
           // @ts-expect-error - Valid sitemap changefreq value

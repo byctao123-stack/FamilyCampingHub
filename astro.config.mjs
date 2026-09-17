@@ -7,6 +7,7 @@ import react from '@astrojs/react'
 
 export default defineConfig({
   site: 'https://familycampinghub.shop/',
+  trailingSlash: 'always',
   integrations: [
     react(),
     mdx(),
